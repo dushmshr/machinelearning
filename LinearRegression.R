@@ -63,8 +63,9 @@ summary(linearMod)
 # make base line predictions
 Purchase = predict(linearMod,ohe_test[,-4]
 submit = data.frame(cbind(ohe_test[,c(1,2)],Purchase))
-write.csv(submit,file="/home/1060929/Suresh/Personal/RnD/AV/balckfriday/submit.csv")
-
+write.csv(submit,file="submit.csv")
+#score: 2292 on AV leaderboard
+#**************************************** base line model ******************************************
 modelSummary <- summary(linearMod)  # capture model summary as an object
 modelCoeffs <- modelSummary$coefficients  # model coefficients
 beta.estimate <- modelCoeffs["Stay_In_Current_City_Years", "Estimate"]  # get beta estimate for speed
