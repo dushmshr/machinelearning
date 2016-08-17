@@ -2,8 +2,12 @@
 library(data.table)
 library(caret)
 
-#load data
-data = read.table("train.csv",sep=",",header = T)
+#load data and preparation
+train = read.table("train.csv",sep=",",header = T) 
+test =  read.table("test-comb.csv",sep=",",header = T) 
+test = test[,-c(1,13)]
+test$Purchase = NA
+data = rbind(train,test)
 
 # *************************** data exploration  ****************************************************
 head(data)
@@ -38,23 +42,29 @@ dummy_2 = dummyVars("~.",data=data[,c(3:6,8)])
 ohe_dummy2 = data.frame(predict(dummy_2,newdata = data[,c(3:6,8)]))
 ohe_data = cbind(data,ohe_dummy,ohe_dummy2)
 ohe_data_final = ohe_data[ , -which(names(ohe_data) %in% c("Product_Category_1","Product_Category_2","Product_Category_3","Gender","Age","Occupation","City_Category","Marital_Status"))]
-ohe_data_final$Product_Category_2.1 = 0
-ohe_data_final$Product_Category_2.19 = 0
-ohe_data_final$Product_Category_2.20 = 0
-ohe_data_final$Product_Category_3.1 = 0
-ohe_data_final$Product_Category_3.2 = 0
-ohe_data_final$Product_Category_3.19 = 0
-ohe_data_final$Product_Category_3.20 = 0
 
+#ohe_data_final$Product_Category_2.1 = 0
+#ohe_data_final$Product_Category_2.19 = 0
+#ohe_data_final$Product_Category_2.20 = 0
+#ohe_data_final$Product_Category_3.1 = 0
+#ohe_data_final$Product_Category_3.2 = 0
+#ohe_data_final$Product_Category_3.19 = 0
+#ohe_data_final$Product_Category_3.20 = 0
 
-# ********************parameter tuning with CARET*********************************************
-library(caret)
-
+ohe_train = ohe_data_final[1:550068,]
+ohe_test = ohe_data_final[550069:783667,]
+ohe_train[is.na(ohe_train)] = 0
+ohe_test[is.na(ohe_test)] = 0
 
 # *************************** base line model  ****************************************************
-'linearMod <- lm(Purchase~.,data=ohe_data_final[,-c(1,2)])
-
+linearMod <- lm(Purchase~.,data=ohe_train[,-c(1,2)])
 summary(linearMod)
+
+# make base line predictions
+Purchase = predict(linearMod,ohe_test[,-4]
+submit = data.frame(cbind(ohe_test[,c(1,2)],Purchase))
+write.csv(submit,file="/home/1060929/Suresh/Personal/RnD/AV/balckfriday/submit.csv")
+
 modelSummary <- summary(linearMod)  # capture model summary as an object
 modelCoeffs <- modelSummary$coefficients  # model coefficients
 beta.estimate <- modelCoeffs["Stay_In_Current_City_Years", "Estimate"]  # get beta estimate for speed
@@ -86,3 +96,5 @@ for (i in 1:10)
     glm.fit = glm(Purchase~poly(ohe_data_final$.,i),data=ohe_data_final[,-c(1,2)])
     cv.error.10[i] =cv.glm(ohe_data_final[,-c(1,2)] ,glm.fit,K=10)
 }
+# ********************parameter tuning with CARET*********************************************
+library(caret)
