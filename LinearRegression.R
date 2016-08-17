@@ -3,7 +3,7 @@ library(data.table)
 library(caret)
 
 #load data
-data = read.table("C://Suresh//R&D//AV//blackfirday//train.csv",sep=",",header = T)
+data = read.table("train.csv",sep=",",header = T)
 
 # *************************** data exploration  ****************************************************
 head(data)
